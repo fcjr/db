@@ -10,6 +10,14 @@ func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
 	key := req.URL.Query().Get("key")
 	val := s.store.Get(key)
 
+	if val == "" {
+		_ = respond.Text(w,
+			[]byte("key not found"),
+			respond.WithStatusCode(http.StatusNotFound),
+		)
+		return
+	}
+
 	_ = respond.Text(w, []byte(val))
 }
 
