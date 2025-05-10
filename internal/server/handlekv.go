@@ -1,12 +1,16 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/fcjr/db/internal/server/respond"
+)
 
 func (s *Server) handleGet(w http.ResponseWriter, req *http.Request) {
 	key := req.URL.Query().Get("key")
 	val := s.store.Get(key)
 
-	_ = respondText(w, []byte(val))
+	_ = respond.Text(w, []byte(val))
 }
 
 func (s *Server) handleSet(w http.ResponseWriter, req *http.Request) {
@@ -16,9 +20,9 @@ func (s *Server) handleSet(w http.ResponseWriter, req *http.Request) {
 	for key, val := range query {
 		if len(val) != 1 {
 			// TODO what should we do in this case?
-			_ = respondText(w,
+			_ = respond.Text(w,
 				[]byte("tried to set the same option more than once"),
-				withStatusCode(http.StatusBadRequest),
+				respond.WithStatusCode(http.StatusBadRequest),
 			)
 			return
 		}

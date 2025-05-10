@@ -1,19 +1,19 @@
-package server
+package respond
 
 import "net/http"
 
-type respondTextOptions struct {
+type respondOptions struct {
 	statusCode int
 }
 
-func withStatusCode(statusCode int) func(opts *respondTextOptions) {
-	return func(opts *respondTextOptions) {
+func WithStatusCode(statusCode int) func(opts *respondOptions) {
+	return func(opts *respondOptions) {
 		opts.statusCode = statusCode
 	}
 }
 
-func respondText(w http.ResponseWriter, text []byte, opts ...func(*respondTextOptions)) error {
-	options := &respondTextOptions{
+func Text(w http.ResponseWriter, text []byte, opts ...func(*respondOptions)) error {
+	options := &respondOptions{
 		statusCode: http.StatusAccepted,
 	}
 
