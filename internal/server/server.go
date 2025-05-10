@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/fcjr/db/internal/server/middleware"
 	"github.com/fcjr/db/internal/store"
 )
 
@@ -17,8 +18,8 @@ const defaultShutdownGracePeriod = 10 * time.Second
 type ServerOption func(*Server) error
 
 type Server struct {
-	logger *slog.Logger
-	mux    *http.ServeMux
+	logger  *slog.Logger
+	handler http.Handler
 
 	readTimeout         time.Duration
 	writeTimeout        time.Duration
@@ -30,7 +31,6 @@ type Server struct {
 func New(opts ...ServerOption) (*Server, error) {
 	s := &Server{
 		logger: slog.Default(),
-		mux:    http.NewServeMux(),
 
 		readTimeout:         defaultReadTimeout,
 		writeTimeout:        defaultReadTimeout,
@@ -46,9 +46,21 @@ func New(opts ...ServerOption) (*Server, error) {
 		}
 	}
 
+	// create and set handler
+	mux := http.NewServeMux()
+	s.handler = mux
+
 	// register routes
-	s.mux.HandleFunc("GET /get", s.handleGet)
-	s.mux.HandleFunc("POST /set", s.handleSet)
+	mux.HandleFunc("GET /get", s.handleGet)
+	mux.HandleFunc("POST /set", s.handleSet)
+
+	// apply base middleware
+	baseMiddleware := []middleware.Middleware{
+		middleware.WithRecovery(s.logger), // should be outermost (first) to catch panics in other middleware
+	}
+	for i := len(baseMiddleware) - 1; i >= 0; i-- {
+		s.handler = baseMiddleware[i](s.handler)
+	}
 
 	return s, nil
 }
@@ -57,7 +69,7 @@ func (s *Server) ListenAndServe(ctx context.Context, addr string) error {
 
 	httpServer := &http.Server{
 		Addr:         addr,
-		Handler:      s.mux,
+		Handler:      s.handler,
 		ReadTimeout:  s.readTimeout,
 		WriteTimeout: s.writeTimeout,
 		BaseContext: func(listener net.Listener) context.Context {
