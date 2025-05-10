@@ -14,7 +14,7 @@ func WithStatusCode(statusCode int) func(opts *respondOptions) {
 
 func Text(w http.ResponseWriter, text []byte, opts ...func(*respondOptions)) error {
 	options := &respondOptions{
-		statusCode: http.StatusAccepted,
+		statusCode: http.StatusOK,
 	}
 
 	for _, opt := range opts {
