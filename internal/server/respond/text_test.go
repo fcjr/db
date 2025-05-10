@@ -51,8 +51,9 @@ func TestText(t *testing.T) {
 			}
 
 			// check content type
-			if wr.Header().Get("Content-Type") != "application/text" {
-				t.Fatalf("expected %s for content type, got %s", "application/text", wr.Header().Get("Content-Type"))
+			expectedType := "text/plain; charset=utf-8"
+			if wr.Header().Get("Content-Type") != expectedType {
+				t.Fatalf("expected %s for content type, got %s", expectedType, wr.Header().Get("Content-Type"))
 			}
 
 			// check status code

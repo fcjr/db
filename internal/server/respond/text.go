@@ -22,7 +22,7 @@ func Text(w http.ResponseWriter, text []byte, opts ...func(*respondOptions)) err
 	}
 
 	w.WriteHeader(options.statusCode)
-	w.Header().Add("Content-Type", "application/text")
+	w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 
 	_, err := w.Write(text)
 	if err != nil {
