@@ -33,7 +33,7 @@ func New(opts ...ServerOption) (*Server, error) {
 		logger: slog.Default(),
 
 		readTimeout:         defaultReadTimeout,
-		writeTimeout:        defaultReadTimeout,
+		writeTimeout:        defaultWriteTimeout,
 		shutdownGracePeriod: defaultShutdownGracePeriod,
 
 		store: store.New(),
