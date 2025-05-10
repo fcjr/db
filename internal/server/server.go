@@ -57,6 +57,7 @@ func New(opts ...ServerOption) (*Server, error) {
 	// apply base middleware
 	baseMiddleware := []middleware.Middleware{
 		middleware.WithRecovery(s.logger), // should be outermost (first) to catch panics in other middleware
+		middleware.WithLogging(s.logger),
 	}
 	for i := len(baseMiddleware) - 1; i >= 0; i-- {
 		s.handler = baseMiddleware[i](s.handler)
